@@ -35,3 +35,11 @@ def list_products(access_token: str) -> dict:
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()
+
+def show_product_details(access_token: str, product_id: str) -> dict:
+    url = f"{settings.PAYPAL_BASE_URL}/v1/catalogs/products/{product_id}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()

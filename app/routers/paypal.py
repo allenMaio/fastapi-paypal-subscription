@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends ,HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from app.schemas.product import Product
-from app.services.paypal_service import generate_access_token, create_product, list_products
+from app.services.paypal_service import generate_access_token, create_product, list_products, show_product_details
 from app.services.paypal_store import paypal_token_store
 
 security = HTTPBasic()
@@ -40,5 +40,15 @@ async def list_products_route():
         raise HTTPException(401, "Token not found, please login first.")
     try:
         return list_products(access_token)
+    except Exception as e:
+        print(e)
+
+@product_router.get("/{product_id}")
+async def show_product_details_route(product_id: str):
+    access_token = paypal_token_store.get("access_token")
+    if not access_token:
+        raise HTTPException(401, "Token not found, please login first.")
+    try:
+        return show_product_details(access_token, product_id)
     except Exception as e:
         print(e)
