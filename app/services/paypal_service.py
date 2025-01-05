@@ -2,7 +2,7 @@ import requests
 from fastapi import HTTPException
 from fastapi.security import HTTPBasicCredentials
 from app.core.config import settings
-from app.schemas.product import Product
+from app.schemas.paypal_schema import Product, Plan
 from app.services.paypal_store import store_paypal_token
 
 
@@ -48,6 +48,30 @@ def list_products(access_token: str) -> dict:
 
 def show_product_details(access_token: str, product_id: str) -> dict:
     url = f"{settings.PAYPAL_BASE_URL}/v1/catalogs/products/{product_id}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def create_plan(access_token: str, plan: Plan) -> dict:
+    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.post(url, headers=headers, json=plan.model_dump())
+    response.raise_for_status()
+    return response.json()
+
+def list_plans(access_token: str) -> dict:
+    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def show_plan_details(access_token: str, plan_id: str) -> dict:
+    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans/{plan_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.get(url, headers=headers)
