@@ -6,7 +6,7 @@ from app.services.paypal_service import (
     generate_access_token,
     create_product, list_products, show_product_details,
     create_plan, list_plans, show_plan_details,
-    create_subscription, show_subscription_details
+    create_subscription, show_subscription_details, update_subscription 
 )
 from app.services.paypal_store import get_paypal_token
 
@@ -92,3 +92,11 @@ def show_subscription_details_route(
     access_token: str = Depends(get_paypal_token)
 ):
     return call_paypal_service(show_subscription_details, access_token, subscription_id, fields)
+
+@subscription_router.patch("/{subscription_id}")
+def update_subscription_route(
+    subscription_id: str,
+    data: list[dict],
+    access_token: str = Depends(get_paypal_token)
+):
+    return call_paypal_service(update_subscription, access_token, subscription_id, data)

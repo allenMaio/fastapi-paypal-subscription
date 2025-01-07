@@ -108,3 +108,13 @@ def show_subscription_details(access_token: str, subscription_id: str, fields: s
     response = requests.get(url, headers=headers, params=payload)
     response.raise_for_status()
     return response.json()
+
+def update_subscription(access_token: str, subscription_id: str, data: list[dict]) -> dict:
+    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/subscriptions/{subscription_id}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.patch(url, headers=headers, json=data)
+    response.raise_for_status()
+    if response.status_code == 204:
+        return {"message": "Subscription updated successfully"}
+    return response.json()
