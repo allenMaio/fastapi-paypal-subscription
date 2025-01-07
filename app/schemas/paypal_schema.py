@@ -14,7 +14,18 @@ class Plan(BaseModel):
     name: str
     billing_cycles: list
     payment_preferences: dict
-    status: str | None = None
+    status: str | None = "ACTIVE"
     description: str | None = None
-    quantity_supported: bool | None = None
+    quantity_supported: bool | None = False
     taxes: dict | None = None
+
+class Subscription(BaseModel):
+    plan_id: str
+    quantity: str | None = None
+    auto_renewal: bool | None = False
+    custom_id: str | None = None
+    start_time: str | None = None
+    shipping_amount: dict | None = None
+    subscriber: dict | None = None
+    application_context: dict | None = None
+    plan: dict | None = None

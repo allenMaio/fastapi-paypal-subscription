@@ -6,6 +6,7 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore"
     )
+    PROJECT_NAME: str = "fastapi-paypal-subscription"
     API_V1_STR: str = "/api/v1"
 
     PAYPAL_BASE_URL: str = "https://api-m.sandbox.paypal.com"
