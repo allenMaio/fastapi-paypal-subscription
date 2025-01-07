@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "fastapi-paypal-subscription"
     API_V1_STR: str = "/api/v1"
 
-    PAYPAL_BASE_URL: str = "https://api-m.sandbox.paypal.com"
+    PAYPAL_BASE_URL: str = "https://api-m.sandbox.paypal.com/v1"
     PAYPAL_CLIENT_ID: str
     PAYPAL_CLIENT_SECRET: str
 

@@ -5,6 +5,11 @@ from app.core.config import settings
 from app.schemas.paypal_schema import Product, Plan, Subscription
 from app.services.paypal_store import store_paypal_token
 
+AUTH_BASE_URL = f"{settings.PAYPAL_BASE_URL}/oauth2/token"
+PRODUCT_BASE_URL = f"{settings.PAYPAL_BASE_URL}/catalogs/products"
+PLAN_BASE_URL = f"{settings.PAYPAL_BASE_URL}/billing/plans"
+SUBSCRIPTION_BASE_URL = f"{settings.PAYPAL_BASE_URL}/billing/subscriptions"
+
 
 def call_paypal_service(service_func, *args, **kwargs):
     try:
@@ -22,7 +27,7 @@ def generate_access_token(credentials: HTTPBasicCredentials) -> str:
     if not client_id or not client_secret:
         raise ValueError("PayPal Client ID or Client Secret is missing.")
     
-    url = f"{settings.PAYPAL_BASE_URL}/v1/oauth2/token"
+    url = AUTH_BASE_URL
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {"grant_type": "client_credentials"}
 
@@ -37,7 +42,7 @@ def generate_access_token(credentials: HTTPBasicCredentials) -> str:
 # Product
 # ------------------------------------------------------------------------------
 def create_product(access_token: str, product: Product) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/catalogs/products"
+    url = PRODUCT_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.post(url, headers=headers, json=product.model_dump())
@@ -45,7 +50,7 @@ def create_product(access_token: str, product: Product) -> dict:
     return response.json()
 
 def list_products(access_token: str) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/catalogs/products"
+    url = PRODUCT_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.get(url, headers=headers)
@@ -53,7 +58,7 @@ def list_products(access_token: str) -> dict:
     return response.json()
 
 def show_product_details(access_token: str, product_id: str) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/catalogs/products/{product_id}"
+    url = f"{PRODUCT_BASE_URL}/{product_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.get(url, headers=headers)
@@ -64,7 +69,7 @@ def show_product_details(access_token: str, product_id: str) -> dict:
 # Plan
 # ------------------------------------------------------------------------------
 def create_plan(access_token: str, plan: Plan) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans"
+    url = PLAN_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.post(url, headers=headers, json=plan.model_dump())
@@ -72,7 +77,7 @@ def create_plan(access_token: str, plan: Plan) -> dict:
     return response.json()
 
 def list_plans(access_token: str) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans"
+    url = PLAN_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.get(url, headers=headers)
@@ -80,7 +85,7 @@ def list_plans(access_token: str) -> dict:
     return response.json()
 
 def show_plan_details(access_token: str, plan_id: str) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/plans/{plan_id}"
+    url = f"{PLAN_BASE_URL}/{plan_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.get(url, headers=headers)
@@ -91,7 +96,7 @@ def show_plan_details(access_token: str, plan_id: str) -> dict:
 # Subscription
 # ------------------------------------------------------------------------------
 def create_subscription(access_token: str, subscription: Subscription) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/subscriptions"
+    url = SUBSCRIPTION_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.post(url, headers=headers, json=subscription.model_dump())
@@ -99,7 +104,7 @@ def create_subscription(access_token: str, subscription: Subscription) -> dict:
     return response.json()
 
 def show_subscription_details(access_token: str, subscription_id: str, fields: str = None) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/subscriptions/{subscription_id}"
+    url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
     payload = {}
     if fields:
@@ -110,11 +115,23 @@ def show_subscription_details(access_token: str, subscription_id: str, fields: s
     return response.json()
 
 def update_subscription(access_token: str, subscription_id: str, data: list[dict]) -> dict:
-    url = f"{settings.PAYPAL_BASE_URL}/v1/billing/subscriptions/{subscription_id}"
+    url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
 
     response = requests.patch(url, headers=headers, json=data)
     response.raise_for_status()
     if response.status_code == 204:
         return {"message": "Subscription updated successfully"}
+    return response.json()
+
+def list_transactions(access_token: str, subscription_id: str, start_time: str, end_time: str) -> dict:
+    url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}/transactions"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    payload = {
+        "start_time": start_time,
+        "end_time": end_time
+    }
+
+    response = requests.get(url, headers=headers, params=payload)
+    response.raise_for_status()
     return response.json()
