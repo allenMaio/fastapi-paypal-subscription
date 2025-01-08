@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-class Product(BaseModel):
+
+class CreateProductRequest(BaseModel):
     name: str
     type: str
     id: str | None = None
@@ -9,7 +10,7 @@ class Product(BaseModel):
     image_url: str | None = None
     home_url: str | None = None
 
-class Plan(BaseModel):
+class CreatePlanRequest(BaseModel):
     product_id: str
     name: str
     billing_cycles: list
@@ -19,7 +20,7 @@ class Plan(BaseModel):
     quantity_supported: bool | None = False
     taxes: dict | None = None
 
-class Subscription(BaseModel):
+class CreateSubscriptionRequest(BaseModel):
     plan_id: str
     quantity: str | None = None
     auto_renewal: bool | None = False
@@ -29,3 +30,15 @@ class Subscription(BaseModel):
     subscriber: dict | None = None
     application_context: dict | None = None
     plan: dict | None = None
+
+class ShowSubscriptionDetailsQuery(BaseModel):
+    fields: str | None = None
+
+class ListTransactionsQuery(BaseModel):
+    start_time: str
+    end_time: str
+
+class PatchOperation(BaseModel):
+    op: str
+    path: str
+    value: dict

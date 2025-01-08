@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from app.schemas.paypal_schema import Product, Plan, Subscription
+from app.schemas.paypal_schema import (
+    CreateProductRequest, CreatePlanRequest, CreateSubscriptionRequest,
+    ShowSubscriptionDetailsQuery, ListTransactionsQuery,
+    PatchOperation,
+)
 from app.services.paypal_service import (
     call_paypal_service,
     generate_access_token,
@@ -30,7 +34,7 @@ product_router = APIRouter(tags=["product"], prefix="/products")
 
 @product_router.post("")
 def create_product_route(
-    product: Product,
+    product: CreateProductRequest,
     access_token: str = Depends(get_paypal_token)
 ):
     return call_paypal_service(create_product, access_token, product)
@@ -55,7 +59,7 @@ plan_router = APIRouter(tags=["plan"], prefix="/plans")
 
 @plan_router.post("")
 def create_plan_route(
-    plan: Plan,
+    plan: CreatePlanRequest,
     access_token: str = Depends(get_paypal_token)
 ):
     return call_paypal_service(create_plan, access_token, plan)
@@ -80,7 +84,7 @@ subscription_router = APIRouter(tags=["subscription"], prefix="/subscriptions")
 
 @subscription_router.post("")
 def create_subscription_route(
-    subscription: Subscription,
+    subscription: CreateSubscriptionRequest,
     access_token: str = Depends(get_paypal_token)
 ):
     return call_paypal_service(create_subscription, access_token, subscription)
@@ -88,24 +92,23 @@ def create_subscription_route(
 @subscription_router.get("/{subscription_id}")
 def show_subscription_details_route(
     subscription_id: str,
-    fields: str = None,
+    query: ShowSubscriptionDetailsQuery = Depends(),
     access_token: str = Depends(get_paypal_token)
 ):
-    return call_paypal_service(show_subscription_details, access_token, subscription_id, fields)
+    return call_paypal_service(show_subscription_details, access_token, subscription_id, query)
 
 @subscription_router.patch("/{subscription_id}")
 def update_subscription_route(
     subscription_id: str,
-    data: list[dict],
+    request: list[PatchOperation],
     access_token: str = Depends(get_paypal_token)
 ):
-    return call_paypal_service(update_subscription, access_token, subscription_id, data)
+    return call_paypal_service(update_subscription, access_token, subscription_id, request)
 
 @subscription_router.get("/{subscription_id}/transactions")
 def list_transactions_route(
     subscription_id: str,
-    start_time: str,
-    end_time: str,
+    query: ListTransactionsQuery = Depends(),
     access_token: str = Depends(get_paypal_token)
 ):
-    return call_paypal_service(list_transactions, access_token, subscription_id, start_time, end_time)
+    return call_paypal_service(list_transactions, access_token, subscription_id, query)

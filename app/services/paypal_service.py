@@ -2,7 +2,11 @@ import requests
 from fastapi import HTTPException
 from fastapi.security import HTTPBasicCredentials
 from app.core.config import settings
-from app.schemas.paypal_schema import Product, Plan, Subscription
+from app.schemas.paypal_schema import (
+    CreateProductRequest, CreatePlanRequest, CreateSubscriptionRequest,
+    ShowSubscriptionDetailsQuery, ListTransactionsQuery,
+    PatchOperation
+)
 from app.services.paypal_store import store_paypal_token
 
 AUTH_BASE_URL = f"{settings.PAYPAL_BASE_URL}/oauth2/token"
@@ -41,7 +45,7 @@ def generate_access_token(credentials: HTTPBasicCredentials) -> str:
 
 # Product
 # ------------------------------------------------------------------------------
-def create_product(access_token: str, product: Product) -> dict:
+def create_product(access_token: str, product: CreateProductRequest) -> dict:
     url = PRODUCT_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -68,7 +72,7 @@ def show_product_details(access_token: str, product_id: str) -> dict:
 
 # Plan
 # ------------------------------------------------------------------------------
-def create_plan(access_token: str, plan: Plan) -> dict:
+def create_plan(access_token: str, plan: CreatePlanRequest) -> dict:
     url = PLAN_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -95,7 +99,7 @@ def show_plan_details(access_token: str, plan_id: str) -> dict:
 
 # Subscription
 # ------------------------------------------------------------------------------
-def create_subscription(access_token: str, subscription: Subscription) -> dict:
+def create_subscription(access_token: str, subscription: CreateSubscriptionRequest) -> dict:
     url = SUBSCRIPTION_BASE_URL
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -103,33 +107,34 @@ def create_subscription(access_token: str, subscription: Subscription) -> dict:
     response.raise_for_status()
     return response.json()
 
-def show_subscription_details(access_token: str, subscription_id: str, fields: str = None) -> dict:
+def show_subscription_details(access_token: str, subscription_id: str, query: ShowSubscriptionDetailsQuery) -> dict:
     url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
     payload = {}
-    if fields:
-        payload["fields"] = fields
+    if query:
+        payload["fields"] = query.fields
 
     response = requests.get(url, headers=headers, params=payload)
     response.raise_for_status()
     return response.json()
 
-def update_subscription(access_token: str, subscription_id: str, data: list[dict]) -> dict:
+def update_subscription(access_token: str, subscription_id: str, data: list[PatchOperation]) -> dict:
     url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
+    dict_data = [op.model_dump() for op in data]
 
-    response = requests.patch(url, headers=headers, json=data)
+    response = requests.patch(url, headers=headers, json=dict_data)
     response.raise_for_status()
     if response.status_code == 204:
         return {"message": "Subscription updated successfully"}
     return response.json()
 
-def list_transactions(access_token: str, subscription_id: str, start_time: str, end_time: str) -> dict:
+def list_transactions(access_token: str, subscription_id: str, query: ListTransactionsQuery) -> dict:
     url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}/transactions"
     headers = {"Authorization": f"Bearer {access_token}"}
     payload = {
-        "start_time": start_time,
-        "end_time": end_time
+        "start_time": query.start_time,
+        "end_time": query.end_time
     }
 
     response = requests.get(url, headers=headers, params=payload)
