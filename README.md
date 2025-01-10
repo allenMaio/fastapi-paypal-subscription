@@ -1,1 +1,1 @@
-# fastapi-paypal-subscribe
+# fastapi-paypal-subscription
