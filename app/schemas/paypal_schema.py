@@ -29,7 +29,6 @@ class CreateSubscriptionRequest(BaseModel):
     shipping_amount: dict | None = None
     subscriber: dict | None = None
     application_context: dict | None = None
-    plan: dict | None = None
 
 class ShowSubscriptionDetailsQuery(BaseModel):
     fields: str | None = None
