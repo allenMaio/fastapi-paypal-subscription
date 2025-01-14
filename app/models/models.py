@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional, List
 from sqlalchemy import ForeignKey
 from sqlalchemy import String, Text, JSON, BOOLEAN
 from sqlalchemy.orm import Mapped
