@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     DB_NAME: str = "paypal_test"
     DB_USER: str = "myuser"
     DB_PASSWORD: str
-    DB_HOST: str = "localhost"
+    DB_HOST: str = os.getenv("DB_HOST", "localhost")
     DB_PORT: str = "5432"
 
     @property
