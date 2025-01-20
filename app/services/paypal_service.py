@@ -51,7 +51,9 @@ def create_product(access_token: str, product: CreateProductRequest) -> dict:
 
     response = requests.post(url, headers=headers, json=product.model_dump())
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    res.pop("links", None)
+    return res
 
 def list_products(access_token: str) -> dict:
     url = PRODUCT_BASE_URL
@@ -67,7 +69,9 @@ def show_product_details(access_token: str, product_id: str) -> dict:
 
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    res.pop("links", None)
+    return res
 
 
 # Plan
@@ -78,7 +82,9 @@ def create_plan(access_token: str, plan: CreatePlanRequest) -> dict:
 
     response = requests.post(url, headers=headers, json=plan.model_dump())
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    res.pop("links", None)
+    return res
 
 def list_plans(access_token: str) -> dict:
     url = PLAN_BASE_URL
@@ -94,7 +100,9 @@ def show_plan_details(access_token: str, plan_id: str) -> dict:
 
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    res.pop("links", None)
+    return res
 
 
 # Subscription
@@ -116,7 +124,10 @@ def show_subscription_details(access_token: str, subscription_id: str, query: Sh
 
     response = requests.get(url, headers=headers, params=payload)
     response.raise_for_status()
-    return response.json()
+    res = response.json()
+    res.pop("links", None)
+    res.pop("billing_info", None)
+    return res
 
 def update_subscription(access_token: str, subscription_id: str, data: list[PatchOperation]) -> dict:
     url = f"{SUBSCRIPTION_BASE_URL}/{subscription_id}"
