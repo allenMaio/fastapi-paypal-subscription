@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     PAYPAL_BASE_URL: str = "https://api-m.sandbox.paypal.com/v1"
     PAYPAL_CLIENT_ID: str
     PAYPAL_CLIENT_SECRET: str
+    PAYPAL_WEBHOOK_ID: str
 
     DB: str = "postgresql"
     DB_NAME: str = "paypal_test"

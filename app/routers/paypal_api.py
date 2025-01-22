@@ -5,7 +5,7 @@ from app.schemas.paypal_schema import (
     ShowSubscriptionDetailsQuery, ListTransactionsQuery,
     PatchOperation,
 )
-from app.services.paypal_service import (
+from app.services.paypal_api_service import (
     call_paypal_service,
     generate_access_token,
     create_product, list_products, show_product_details,
